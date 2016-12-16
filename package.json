@@ -1,0 +1,23 @@
+{
+  "name": "star-amqp",
+  "version": "1.0.0",
+  "description": "A simple to use RabbitMQ/AMQP module.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mikael Lirbank",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lirbank/star-amqp.git"
+  },
+  "keywords": [
+    "amqp",
+    "rabbitmq"
+  ],
+  "bugs": {
+    "url": "https://github.com/lirbank/star-amqp/issues"
+  },
+  "homepage": "https://github.com/lirbank/star-amqp#readme"
+}
