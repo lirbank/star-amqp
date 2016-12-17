@@ -1,0 +1,25 @@
+{
+  "extends": [
+    "eslint:recommended"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 8,
+    "sourceType": "module"
+  },
+  "env": {
+    "node": true,
+    "es6": true,
+    "mocha": true
+  },
+  "rules": {
+    "no-console": "warn",
+    "max-len": ["warn", 80, { "ignoreUrls": true }],
+    "semi": "error",
+    "quotes": ["error", "single"],
+    "indent": ["error", 2],
+    "comma-spacing": ["error", { "before": false, "after": true }],
+    "space-infix-ops": "error",
+    "key-spacing": ["error"],
+    "space-unary-ops": ["error", {"nonwords": true}]
+  }
+}

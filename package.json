@@ -2,9 +2,13 @@
   "name": "star-amqp",
   "version": "1.0.0",
   "description": "A simple to use RabbitMQ/AMQP module.",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "babel src -d dist",
+    "preinstall": "npm run build",
+    "lint": "eslint . || true",
+    "flow": "flow; test $? -eq 0 -o $? -eq 2",
+    "test": "mocha --require babel-register || true"
   },
   "author": "Mikael Lirbank",
   "license": "MIT",
@@ -19,5 +23,19 @@
   "bugs": {
     "url": "https://github.com/lirbank/star-amqp/issues"
   },
-  "homepage": "https://github.com/lirbank/star-amqp#readme"
+  "homepage": "https://github.com/lirbank/star-amqp#readme",
+  "devDependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-plugin-transform-flow-strip-types": "^6.21.0",
+    "babel-preset-env": "^1.1.4",
+    "babel-register": "^6.18.0",
+    "chai": "^3.5.0",
+    "chai-as-promised": "^6.0.0",
+    "eslint": "^3.12.2",
+    "flow-bin": "^0.37.0",
+    "mocha": "^3.2.0"
+  },
+  "dependencies": {
+    "amqplib": "^0.5.1"
+  }
 }
