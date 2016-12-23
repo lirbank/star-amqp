@@ -100,4 +100,69 @@ export default class AMQP {
   async waitForConfirms() {
     return await this.producerChannel.waitForConfirms();
   }
+
+  async registerWorker(q, worker, prefetch = 1, retryDelay = 60000) {
+
+    // Connect to RabbitMQ
+    await this.connect();
+
+    // eslint-disable-next-line no-console
+    console.log(`-> Registering worker on MQ: ${q}`);
+
+    // Retry queue name
+    let retryQ = q + '-retry';
+
+    // Set up a channel for the worker
+    let ch = await this.connection.createChannel();
+    await ch.prefetch(prefetch);
+
+    // The main queue
+    await ch.assertQueue(q, {
+      durable: true,
+      deadLetterExchange: '',
+      deadLetterRoutingKey: retryQ
+    });
+
+    // The retry queue - nacked jobs will go here, once the TTL expires they go
+    // back into the main queue.
+    await ch.assertQueue(retryQ, {
+      durable: true,
+      deadLetterExchange: '',
+      deadLetterRoutingKey: q,
+      messageTtl: retryDelay
+    });
+
+    // Attach the worker
+    return ch.consume(q, async function (msg) {
+      try {
+        let content = msg.content.toString();
+        let data = JSON.parse(content);
+        let result = await worker(data);
+
+        // Remove the message from the queue
+        if (result === true) {
+          await ch.ack(msg);
+        }
+
+        // Move the message to the retry queue
+        if (result === false) {
+          await ch.nack(msg, false, false);
+        }
+
+        // Move the message to the retry queue after a provided delay.
+        // Keeping a message unacked for some time can be used to temporarily
+        // preventing the consumer from prefetching a new message, effectively
+        // slowing down or block the queue. Ex. for handling rate limits.
+        if (typeof result === 'number') {
+          await new Promise(r => setTimeout(r, result));
+          await ch.nack(msg, false, false);
+        }
+
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error('nack', q, e);
+        await ch.nack(msg, false, false);
+      }
+    }, {noAck: false});
+  }
 }
