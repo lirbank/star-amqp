@@ -1,5 +1,16 @@
+// @flow
 export default class Queue {
-  constructor(amqp, queue, options = {}, worker = null) {
+  queue: string;
+  AMQP: {send: Function, registerWorker: Function};
+  done: Promise<*>; // TODO: annotate type explicitly
+
+  constructor(
+    amqp: {send: Function, registerWorker: Function},
+    queue: string,
+    options: {prefetch: ?number, retryDelay: ?number} | Function,
+    worker: ?Function
+  ) {
+
     this.queue = queue;
     this.AMQP = amqp;
     if (worker) {
@@ -11,15 +22,22 @@ export default class Queue {
     return this.done;
   }
 
-  send(message, confirm = true) {
+  send(message: {}, confirm: boolean = true) {
     return this.AMQP.send(this.queue, message, confirm);
   }
 
-  async registerWorker(options, worker) {
+  async registerWorker(
+    options: {prefetch: ?number, retryDelay: ?number} | Function,
+    worker: ?Function
+  ) {
+
     // Make options optional
     if (typeof options === 'function') {
       worker = options;
-      options = {};
+      options = {
+        prefetch: 1,
+        retryDelay: 60000
+      };
     }
     const {prefetch, retryDelay} = options;
     await this.AMQP.registerWorker(this.queue, worker, prefetch, retryDelay);
