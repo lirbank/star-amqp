@@ -2,16 +2,15 @@ import assert from 'assert';
 import AMQP from './amqp';
 
 export default class Queue {
-  constructor(amqp, queue, options = {}, worker = null) {
+  constructor(amqp, queue, prefetch = 1, worker = null) {
     assert(amqp instanceof AMQP, 'error');
 
-    // Make options optional
-    if (typeof options === 'function') {
-      worker = options;
-      options = {};
+    // Make prefetch optional
+    if (typeof prefetch === 'function') {
+      worker = prefetch;
+      prefetch = 1;
     }
 
-    const {prefetch} = options;
     this.queue = queue;
     this.worker = worker;
     this.AMQP = amqp;
