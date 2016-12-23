@@ -2,20 +2,14 @@ import assert from 'assert';
 import AMQP from './amqp';
 
 export default class Queue {
-  constructor(amqp, queue, prefetch = 1, worker = null) {
-    assert(amqp instanceof AMQP, 'error');
-
-    // Make prefetch optional
-    if (typeof prefetch === 'function') {
-      worker = prefetch;
-      prefetch = 1;
-    }
+  constructor(amqp, queue, options = {}, worker = null) {
+    assert(amqp instanceof AMQP);
+    assert(typeof queue === 'string');
 
     this.queue = queue;
-    this.worker = worker;
     this.AMQP = amqp;
     if (worker) {
-      this.done = this.registerWorker(queue, worker, prefetch || 1);
+      this.done = this.registerWorker(options, worker);
     }
   }
 
@@ -27,25 +21,37 @@ export default class Queue {
     return this.AMQP.send(this.queue, message, confirm);
   }
 
-  async registerWorker(q, worker, prefetch) {
-
-    // Connect to RabbitMQ
-    if (! this.AMQP.connection) {
-      await this.AMQP.connect();
+  async registerWorker(options = {}, worker) {
+    // Make options optional
+    if (typeof options === 'function') {
+      worker = options;
+      options = {};
     }
 
-    // eslint-disable-next-line no-console
-    console.log(`-> Registering worker on MQ: ${q}`);
+    assert(typeof worker === 'function');
+    assert(typeof options === 'object');
+    let {prefetch, retryDelay} = options;
 
-    let retryQ = q + '-retry';
-    let delay = 1000 * 60;
+    // Default prefetch (eg. concurrency)
+    prefetch = prefetch || 1;
+
+    // Default time before retrying nacked messages
+    retryDelay = retryDelay || 1000 * 60;
+
+    // Connect to RabbitMQ
+    await this.AMQP.connect();
+
+    // eslint-disable-next-line no-console
+    console.log(`-> Registering worker on MQ: ${this.queue}`);
+
+    let retryQ = this.queue + '-retry';
 
     // Set up a channel for the worker
     let ch = await this.AMQP.connection.createChannel();
     await ch.prefetch(prefetch);
 
     // The main queue
-    await ch.assertQueue(q, {
+    await ch.assertQueue(this.queue, {
       durable: true,
       deadLetterExchange: '',
       deadLetterRoutingKey: retryQ
@@ -56,12 +62,12 @@ export default class Queue {
     await ch.assertQueue(retryQ, {
       durable: true,
       deadLetterExchange: '',
-      deadLetterRoutingKey: q,
-      messageTtl: delay
+      deadLetterRoutingKey: this.queue,
+      messageTtl: retryDelay
     });
 
     // Attach the worker
-    return ch.consume(q, async function (msg) {
+    return ch.consume(this.queue, async function (msg) {
       try {
         let content = msg.content.toString();
         let data = JSON.parse(content);
@@ -88,7 +94,7 @@ export default class Queue {
 
       } catch (e) {
         // eslint-disable-next-line no-console
-        console.error('nack', q, e);
+        console.error('nack', this.queue, e);
         await ch.nack(msg, false, false);
       }
     }, {noAck: false});
