@@ -18,7 +18,8 @@
   },
   "keywords": [
     "amqp",
-    "rabbitmq"
+    "rabbitmq",
+    "promise"
   ],
   "bugs": {
     "url": "https://github.com/lirbank/star-amqp/issues"
