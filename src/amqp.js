@@ -1,11 +1,10 @@
 // @flow
-import fs from 'fs';
 import amqp from 'amqplib';
 import Queue from './queue';
 
 export default class AMQP {
   url: string
-  certificatePath: string
+  certificate: string
   connectionString: string
   connecting: boolean
   connection: ?{
@@ -16,9 +15,9 @@ export default class AMQP {
   producerChannel: ?{waitForConfirms: Function, sendToQueue: Function}
   producerChannelCreating: boolean
 
-  constructor({url, certificatePath}: {url: string, certificatePath: string}) {
+  constructor({url, certificate}: {url: string, certificate: string}) {
     this.url = url;
-    this.certificatePath = certificatePath;
+    this.certificate = certificate;
     this.connecting = false;
     this.connection;
     this.producerChannelCreating = false;
@@ -45,8 +44,8 @@ export default class AMQP {
     this.connecting = true;
 
     let options = {};
-    if (this.certificatePath) {
-      options = {ca: [fs.readFileSync(this.certificatePath)]};
+    if (this.certificate) {
+      options = {ca: [this.certificate]};
     }
     const conn = await amqp.connect(this.url, options);
 
