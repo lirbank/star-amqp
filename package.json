@@ -26,10 +26,7 @@
   },
   "homepage": "https://github.com/lirbank/star-amqp#readme",
   "devDependencies": {
-    "babel-cli": "^6.18.0",
     "babel-eslint": "^7.1.1",
-    "babel-plugin-transform-flow-strip-types": "^6.21.0",
-    "babel-preset-env": "^1.1.4",
     "babel-register": "^6.18.0",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
@@ -38,6 +35,9 @@
     "mocha": "^3.2.0"
   },
   "dependencies": {
-    "amqplib": "^0.5.1"
+    "amqplib": "^0.5.1",
+    "babel-cli": "^6.18.0",
+    "babel-plugin-transform-flow-strip-types": "^6.21.0",
+    "babel-preset-env": "^1.1.4"
   }
 }
