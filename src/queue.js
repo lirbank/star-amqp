@@ -3,6 +3,7 @@ export default class Queue {
   queue: string;
   AMQP: {send: Function, registerWorker: Function};
   done: Promise<*>; // TODO: annotate type explicitly
+  static bind: Function
 
   constructor(
     amqp: {send: Function, registerWorker: Function},

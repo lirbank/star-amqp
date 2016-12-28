@@ -1,30 +1,43 @@
+// @flow
 import fs from 'fs';
 import amqp from 'amqplib';
 import Queue from './queue';
 
 export default class AMQP {
-  constructor({url, certificatePath}) {
+  url: string
+  certificatePath: string
+  connectionString: string
+  connecting: boolean
+  connection: ?{
+    close: Function,
+    createConfirmChannel: Function,
+    createChannel: Function
+  }
+  producerChannel: ?{waitForConfirms: Function, sendToQueue: Function}
+  producerChannelCreating: boolean
+
+  constructor({url, certificatePath}: {url: string, certificatePath: string}) {
     this.url = url;
     this.certificatePath = certificatePath;
     this.connecting = false;
-    this.connection = null;
-    this.producerChannel = null;
+    this.connection;
     this.producerChannelCreating = false;
+    this.producerChannel;
   }
 
-  get Queue() {
+  get Queue(): Queue {
     return Queue.bind(null, this);
   }
 
-  async connect() {
+  async ensureConnection() {
 
     // Wait for an initated connection process
     if (this.connecting || ! this.url) {
       await new Promise(r => setTimeout(r, 500));
-      return await this.connect();
+      return await this.ensureConnection();
     }
     if (this.connection) {
-      return true;
+      return this.connection;
     }
 
     // eslint-disable-next-line no-console
@@ -35,12 +48,13 @@ export default class AMQP {
     if (this.certificatePath) {
       options = {ca: [fs.readFileSync(this.certificatePath)]};
     }
-    this.connection = await amqp.connect(this.url, options);
+    const conn = await amqp.connect(this.url, options);
 
     // eslint-disable-next-line no-console
     console.log('-> Connected to RabbitMQ');
+    this.connection = conn;
     this.connecting = false;
-    return true;
+    return conn;
   }
 
   async close() {
@@ -51,12 +65,10 @@ export default class AMQP {
     }
   }
 
-  async send(q, data, confirm = true) {
+  async send(q: string, data: {}, confirm: boolean = true) {
 
     // Connect to RabbitMQ
-    if (! this.connection) {
-      await this.connect();
-    }
+    const conn = await this.ensureConnection();
 
     // Wait for the producerChannel to be set up
     if (this.producerChannelCreating) {
@@ -73,7 +85,7 @@ export default class AMQP {
       // createChannel() here, or else sendToQueue() will not have a callback,
       // and we won't be able to create a promise to know if the server has
       // accepted the message (which has caused problems before).
-      this.producerChannel = await this.connection.createConfirmChannel();
+      this.producerChannel = await conn.createConfirmChannel();
 
       // eslint-disable-next-line no-console
       console.log('-> Created RabbitMQ Producer Channel');
@@ -81,30 +93,38 @@ export default class AMQP {
     }
 
     // Send the message
-    let content = JSON.stringify(data);
-    let options = { persistent: true };
-    let ok = this.producerChannel.sendToQueue(q, Buffer.from(content), options);
+    const content = JSON.stringify(data);
+    const options = {persistent: true};
+    const {producerChannel} = this;
+
+    if (! producerChannel) {
+      return false;
+    }
+
+    const ok = producerChannel.sendToQueue(q,
+      Buffer.from(content), options);
 
     // Wait for the broker to confirm the message was received
     if (confirm) {
-      let confirmations = await this.waitForConfirms();
+      const [confirmation] = await producerChannel.waitForConfirms();
 
       // The confirmation is 'undefined' if all is well
-      if (confirmations[0] !== undefined) {
+      if (confirmation !== undefined) {
         return false;
       }
     }
     return ok;
   }
 
-  async waitForConfirms() {
-    return await this.producerChannel.waitForConfirms();
-  }
-
-  async registerWorker(q, worker, prefetch = 1, retryDelay = 60000) {
+  async registerWorker(
+    q: string,
+    worker: Function,
+    prefetch: number = 1,
+    retryDelay: number = 60000
+  ) {
 
     // Connect to RabbitMQ
-    await this.connect();
+    const conn = await this.ensureConnection();
 
     // eslint-disable-next-line no-console
     console.log(`-> Registering worker on MQ: ${q}`);
@@ -113,7 +133,7 @@ export default class AMQP {
     let retryQ = q + '-retry';
 
     // Set up a channel for the worker
-    let ch = await this.connection.createChannel();
+    let ch = await conn.createChannel();
     await ch.prefetch(prefetch);
 
     // The main queue
