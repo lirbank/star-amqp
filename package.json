@@ -8,7 +8,8 @@
     "postinstall": "npm run build",
     "lint": "eslint . || true",
     "flow": "flow; test $? -eq 0 -o $? -eq 2",
-    "test": "mocha --require babel-register || true"
+    "test": "mocha --require babel-register || true",
+    "coverage": "istanbul cover _mocha -- --reporter spec --require babel-register"
   },
   "author": "Mikael Lirbank",
   "license": "MIT",
@@ -32,6 +33,7 @@
     "chai-as-promised": "^6.0.0",
     "eslint": "^3.12.2",
     "flow-bin": "^0.37.0",
+    "istanbul": "^0.4.5",
     "mocha": "^3.2.0"
   },
   "dependencies": {
