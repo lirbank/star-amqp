@@ -1,5 +1,10 @@
 # Star AMQP
 
+## Installation
+```sh
+npm install --save star-amqp
+```
+
 ## Usage
 
 ### Client
