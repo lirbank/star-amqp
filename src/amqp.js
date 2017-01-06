@@ -1,5 +1,6 @@
 // @flow
 import amqp from 'amqplib';
+import assert from 'assert';
 import Queue from './queue';
 
 export default class AMQP {
@@ -15,7 +16,9 @@ export default class AMQP {
   producerChannel: ?{waitForConfirms: Function, sendToQueue: Function}
   producerChannelCreating: boolean
 
-  constructor({url, certificate}: {url: string, certificate: string}) {
+  constructor({url, certificate}: {url: string, certificate: string} = {}) {
+    assert(typeof url === 'string', 'The \'options.url\' param is required');
+
     this.url = url;
     this.certificate = certificate;
     this.connecting = false;
@@ -31,7 +34,7 @@ export default class AMQP {
   async ensureConnection() {
 
     // Wait for an initated connection process
-    if (this.connecting || ! this.url) {
+    if (this.connecting) {
       await new Promise(r => setTimeout(r, 500));
       return await this.ensureConnection();
     }

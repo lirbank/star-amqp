@@ -1,4 +1,6 @@
 // @flow
+import assert from 'assert';
+
 export default class Queue {
   queue: string;
   AMQP: {send: Function, registerWorker: Function};
@@ -11,6 +13,8 @@ export default class Queue {
     options: {prefetch: ?number, retryDelay: ?number} | Function,
     worker: ?Function
   ) {
+
+    assert(typeof queue === 'string', 'The \'queue\' param is required');
 
     this.queue = queue;
     this.AMQP = amqp;
