@@ -35,3 +35,16 @@ TBD
 
 ### Retry queues
 TBD
+
+## Contributing
+Contributions are encouraged.
+
+Before issuing a pull request, please run the following checks.
+
+```sh
+npm run lint
+npm run flow
+URI='amqp://username:password@host/vhost' npm run test
+```
+
+If you need a RabbitMQ server to test against, [CloudAMQP](https://www.cloudamqp.com/) offers free RabbitMQ vhosts.
