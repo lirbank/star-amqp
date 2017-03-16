@@ -84,7 +84,7 @@ const opts = {
 };
 
 # Instantiate the queue and attach the worker with the new options.
-new client.Queue('test-queue', opts, async (message) => true);
+new client.Queue('test-queue', opts, async message => true);
 ```
 
 ### Batch send messages

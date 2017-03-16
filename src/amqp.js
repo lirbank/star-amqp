@@ -43,7 +43,7 @@ export default class AMQP {
     }
 
     // eslint-disable-next-line no-console
-    console.log('-> Connecting to RabbitMQ');
+    console.log('★✩★ Connecting to RabbitMQ');
     this.connecting = true;
 
     let options = {};
@@ -53,7 +53,7 @@ export default class AMQP {
     const conn = await amqp.connect(this.url, options);
 
     // eslint-disable-next-line no-console
-    console.log('-> Connected to RabbitMQ');
+    console.log('★✩★ Connected to RabbitMQ');
     this.connection = conn;
     this.connecting = false;
     return conn;
@@ -61,7 +61,7 @@ export default class AMQP {
 
   async close() {
     // eslint-disable-next-line no-console
-    console.log('-> Disconnecting from RabbitMQ');
+    console.log('★✩★ Disconnecting from RabbitMQ');
     if (this.connection) {
       await this.connection.close();
     }
@@ -81,7 +81,7 @@ export default class AMQP {
     // Set up a channel
     if (! this.producerChannel) {
       // eslint-disable-next-line no-console
-      console.log('-> Creating RabbitMQ Producer Channel');
+      console.log('★✩★ Creating RabbitMQ Producer Channel');
       this.producerChannelCreating = true;
       // NOTE: It's important to use createConfirmChannel() and not
       // createChannel() here, or else sendToQueue() will not have a callback,
@@ -90,7 +90,7 @@ export default class AMQP {
       this.producerChannel = await conn.createConfirmChannel();
 
       // eslint-disable-next-line no-console
-      console.log('-> Created RabbitMQ Producer Channel');
+      console.log('★✩★ Created RabbitMQ Producer Channel');
       this.producerChannelCreating = false;
     }
 
@@ -129,7 +129,7 @@ export default class AMQP {
     const conn = await this.ensureConnection();
 
     // eslint-disable-next-line no-console
-    console.log(`-> Registering worker on MQ: ${q}`);
+    console.log(`★✩★ Registering worker on MQ: ${q}`);
 
     // Retry queue name
     let retryQ = q + '-retry';
