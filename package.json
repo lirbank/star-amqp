@@ -1,11 +1,11 @@
 {
   "name": "star-amqp",
   "version": "0.0.4",
-  "description": "A simple to use RabbitMQ/AMQP module.",
+  "description": "An easy to use RabbitMQ/AMQP module.",
   "main": "dist/index.js",
   "scripts": {
     "build": "babel src -d dist",
-    "postinstall": "npm run build",
+    "prepublish": "npm run build",
     "lint": "eslint . || true",
     "flow": "flow; test $? -eq 0 -o $? -eq 2",
     "test": "mocha --require babel-register test/test.js || true",
