@@ -1,6 +1,6 @@
 {
   "name": "star-amqp",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "An easy to use RabbitMQ/AMQP module.",
   "main": "dist/index.js",
   "scripts": {
