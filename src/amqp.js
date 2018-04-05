@@ -159,7 +159,7 @@ export default class AMQP {
       try {
         let content = msg.content.toString();
         let data = JSON.parse(content);
-        let result = await worker(data);
+        let result = await worker(data, msg);
 
         // Remove the message from the queue
         if (result === true) {
