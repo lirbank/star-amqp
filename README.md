@@ -110,4 +110,4 @@ If you need a RabbitMQ server to test against, [CloudAMQP](https://www.cloudamqp
 
 ## Changelog
 
-0.0.6 - Message details are passed to worker (#1) Thanks @cyrillegin
+0.0.6 - Message details are passed to worker ([#1](../../pull/1)) Thanks [@cyrillegin](https://github.com/cyrillegin)
