@@ -23,8 +23,10 @@ myQueue.send({some: 'stuff'});
 
 ### Consumers (eg. workers)
 ```js
-const myQueue = new client.Queue('test', message => {
-  console.log(JSON.stringify(message));
+const myQueue = new client.Queue('test', (data, info) => {
+  // `data` is the message payload
+  // `info` holds all info about the MQ message (retry count, etc)
+  console.log(JSON.stringify(data));
   return true;
 });
 myQueue.send({some: 'stuff'});
@@ -105,3 +107,7 @@ URI='amqp://username:password@host/vhost' npm run test
 ```
 
 If you need a RabbitMQ server to test against, [CloudAMQP](https://www.cloudamqp.com/) offers free RabbitMQ vhosts.
+
+## Changelog
+
+0.0.6 - Message details are passed to worker (#1) Thanks @cyrillegin
