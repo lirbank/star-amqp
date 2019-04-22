@@ -10,8 +10,8 @@
     "flow": "flow; test $? -eq 0 -o $? -eq 2",
     "test": "mocha --require babel-register test/test.js || true",
     "coverage": "istanbul cover _mocha -- --reporter spec --require babel-register",
-    "prettier": "prettier --list-different \"**/*.{ts,json,md}\"",
-    "prettier:fix": "prettier --write \"**/*.{ts,json,md}\""
+    "prettier": "prettier --list-different \"**/*.{js,ts,json,md}\"",
+    "prettier:fix": "prettier --write \"**/*.{js,ts,json,md}\""
   },
   "author": "Mikael Lirbank",
   "license": "MIT",
