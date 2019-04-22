@@ -9,7 +9,9 @@
     "lint": "eslint . || true",
     "flow": "flow; test $? -eq 0 -o $? -eq 2",
     "test": "mocha --require babel-register test/test.js || true",
-    "coverage": "istanbul cover _mocha -- --reporter spec --require babel-register"
+    "coverage": "istanbul cover _mocha -- --reporter spec --require babel-register",
+    "prettier": "prettier --list-different \"**/*.{ts,json,md}\"",
+    "prettier:fix": "prettier --write \"**/*.{ts,json,md}\""
   },
   "author": "Mikael Lirbank",
   "license": "MIT",
@@ -38,6 +40,7 @@
     "flow-bin": "^0.37.0",
     "istanbul": "^0.4.5",
     "mocha": "^3.2.0",
+    "prettier": "1.17.0",
     "source-map-support": "^0.4.8"
   },
   "dependencies": {
