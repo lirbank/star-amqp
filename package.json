@@ -38,7 +38,7 @@
     "source-map-support": "^0.4.8"
   },
   "dependencies": {
-    "amqplib": "^0.5.1",
+    "amqplib": "^0.5.3",
     "babel-cli": "^6.18.0",
     "babel-plugin-transform-flow-strip-types": "^6.21.0",
     "babel-plugin-transform-runtime": "^6.23.0",
