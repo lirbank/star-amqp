@@ -26,6 +26,9 @@
     "url": "https://github.com/lirbank/star-amqp/issues"
   },
   "homepage": "https://github.com/lirbank/star-amqp#readme",
+  "files": [
+    "dist"
+  ],
   "devDependencies": {
     "babel-eslint": "^7.1.1",
     "babel-register": "^6.18.0",
