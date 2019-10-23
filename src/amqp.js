@@ -4,20 +4,20 @@ import assert from 'assert';
 import Queue from './queue';
 
 export default class AMQP {
-  url: string
-  certificate: string
-  connectionString: string
-  connecting: boolean
+  url: string;
+  certificate: string;
+  connectionString: string;
+  connecting: boolean;
   connection: ?{
     close: Function,
     createConfirmChannel: Function,
-    createChannel: Function
-  }
-  producerChannel: ?{waitForConfirms: Function, sendToQueue: Function}
-  producerChannelCreating: boolean
+    createChannel: Function,
+  };
+  producerChannel: ?{ waitForConfirms: Function, sendToQueue: Function };
+  producerChannelCreating: boolean;
 
-  constructor({url, certificate}: {url: string, certificate: string} = {}) {
-    assert(typeof url === 'string', 'The \'options.url\' param is required');
+  constructor({ url, certificate }: { url: string, certificate: string } = {}) {
+    assert(typeof url === 'string', "The 'options.url' param is required");
 
     this.url = url;
     this.certificate = certificate;
@@ -32,7 +32,6 @@ export default class AMQP {
   }
 
   async ensureConnection() {
-
     // Wait for an initated connection process
     if (this.connecting) {
       await new Promise(r => setTimeout(r, 500));
@@ -48,7 +47,7 @@ export default class AMQP {
 
     let options = {};
     if (this.certificate) {
-      options = {ca: [this.certificate]};
+      options = { ca: [this.certificate] };
     }
     const conn = await amqp.connect(this.url, options);
 
@@ -68,7 +67,6 @@ export default class AMQP {
   }
 
   async send(q: string, data: {}, confirm: boolean = true) {
-
     // Connect to RabbitMQ
     const conn = await this.ensureConnection();
 
@@ -79,7 +77,7 @@ export default class AMQP {
     }
 
     // Set up a channel
-    if (! this.producerChannel) {
+    if (!this.producerChannel) {
       // eslint-disable-next-line no-console
       console.log('★✩★ Creating RabbitMQ Producer Channel');
       this.producerChannelCreating = true;
@@ -96,15 +94,14 @@ export default class AMQP {
 
     // Send the message
     const content = JSON.stringify(data);
-    const options = {persistent: true};
-    const {producerChannel} = this;
+    const options = { persistent: true };
+    const { producerChannel } = this;
 
-    if (! producerChannel) {
+    if (!producerChannel) {
       return false;
     }
 
-    const ok = producerChannel.sendToQueue(q,
-      Buffer.from(content), options);
+    const ok = producerChannel.sendToQueue(q, Buffer.from(content), options);
 
     // Wait for the broker to confirm the message was received
     if (confirm) {
@@ -122,9 +119,8 @@ export default class AMQP {
     q: string,
     worker: Function,
     prefetch: number = 1,
-    retryDelay: number = 60000
+    retryDelay: number = 60000,
   ) {
-
     // Connect to RabbitMQ
     const conn = await this.ensureConnection();
 
@@ -142,7 +138,7 @@ export default class AMQP {
     await ch.assertQueue(q, {
       durable: true,
       deadLetterExchange: '',
-      deadLetterRoutingKey: retryQ
+      deadLetterRoutingKey: retryQ,
     });
 
     // The retry queue - nacked jobs will go here, once the TTL expires they go
@@ -151,40 +147,43 @@ export default class AMQP {
       durable: true,
       deadLetterExchange: '',
       deadLetterRoutingKey: q,
-      messageTtl: retryDelay
+      messageTtl: retryDelay,
     });
 
     // Attach the worker
-    return ch.consume(q, async function (msg) {
-      try {
-        let content = msg.content.toString();
-        let data = JSON.parse(content);
-        let result = await worker(data, msg);
+    return ch.consume(
+      q,
+      async function(msg) {
+        try {
+          let content = msg.content.toString();
+          let data = JSON.parse(content);
+          let result = await worker(data, msg);
 
-        // Remove the message from the queue
-        if (result === true) {
-          await ch.ack(msg);
-        }
+          // Remove the message from the queue
+          if (result === true) {
+            await ch.ack(msg);
+          }
 
-        // Move the message to the retry queue
-        if (result === false) {
+          // Move the message to the retry queue
+          if (result === false) {
+            await ch.nack(msg, false, false);
+          }
+
+          // Move the message to the retry queue after a provided delay.
+          // Keeping a message unacked for some time can be used to temporarily
+          // preventing the consumer from prefetching a new message, effectively
+          // slowing down or block the queue. Ex. for handling rate limits.
+          if (typeof result === 'number') {
+            await new Promise(r => setTimeout(r, result));
+            await ch.nack(msg, false, false);
+          }
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.error('nack', q, e);
           await ch.nack(msg, false, false);
         }
-
-        // Move the message to the retry queue after a provided delay.
-        // Keeping a message unacked for some time can be used to temporarily
-        // preventing the consumer from prefetching a new message, effectively
-        // slowing down or block the queue. Ex. for handling rate limits.
-        if (typeof result === 'number') {
-          await new Promise(r => setTimeout(r, result));
-          await ch.nack(msg, false, false);
-        }
-
-      } catch (e) {
-        // eslint-disable-next-line no-console
-        console.error('nack', q, e);
-        await ch.nack(msg, false, false);
-      }
-    }, {noAck: false});
+      },
+      { noAck: false },
+    );
   }
 }
