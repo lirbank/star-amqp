@@ -124,8 +124,5 @@ v0.0.6 - Message details are passed to worker
 ([#1](https://github.com/lirbank/star-amqp/pull/1)) Thanks
 [@cyrillegin](https://github.com/cyrillegin)
 
-v0.0.7-beta.0 - Upgrade amqplib dependency to v0.5.3
-([#2](https://github.com/lirbank/star-amqp/issues/2))
-
 v0.0.7 - Upgrade amqplib dependency to v0.5.3
-([#2](https://github.com/lirbank/star-amqp/issues/2))
+([#5](https://github.com/lirbank/star-amqp/pull/5))
