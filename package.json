@@ -1,6 +1,6 @@
 {
   "name": "star-amqp",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "An easy to use RabbitMQ/AMQP module.",
   "main": "dist/index.js",
   "scripts": {
@@ -9,7 +9,9 @@
     "lint": "eslint . || true",
     "flow": "flow; test $? -eq 0 -o $? -eq 2",
     "test": "mocha --require babel-register test/test.js || true",
-    "coverage": "istanbul cover _mocha -- --reporter spec --require babel-register"
+    "coverage": "istanbul cover _mocha -- --reporter spec --require babel-register",
+    "prettier": "prettier --list-different \"**/*.{js,ts,json,md}\"",
+    "prettier:fix": "prettier --write \"**/*.{js,ts,json,md}\""
   },
   "author": "Mikael Lirbank",
   "license": "MIT",
@@ -26,6 +28,9 @@
     "url": "https://github.com/lirbank/star-amqp/issues"
   },
   "homepage": "https://github.com/lirbank/star-amqp#readme",
+  "files": [
+    "dist"
+  ],
   "devDependencies": {
     "babel-eslint": "^7.1.1",
     "babel-register": "^6.18.0",
@@ -35,10 +40,11 @@
     "flow-bin": "^0.37.0",
     "istanbul": "^0.4.5",
     "mocha": "^3.2.0",
+    "prettier": "1.17.0",
     "source-map-support": "^0.4.8"
   },
   "dependencies": {
-    "amqplib": "^0.5.1",
+    "amqplib": "^0.5.3",
     "babel-cli": "^6.18.0",
     "babel-plugin-transform-flow-strip-types": "^6.21.0",
     "babel-plugin-transform-runtime": "^6.23.0",
