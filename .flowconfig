@@ -1,2 +1,5 @@
 [options]
-unsafe.enable_getters_and_setters=true
+include_warnings=true
+suppress_comment= \\(.\\|\n\\)*\\$FlowIgnore
+suppress_type=$FlowIgnore
+esproposal.optional_chaining=enable

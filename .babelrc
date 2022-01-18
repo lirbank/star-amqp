@@ -1,9 +1,10 @@
 {
   "presets": [
-    "latest"
+    "@babel/preset-env",
+    "@babel/preset-flow"
   ],
   "plugins": [
-    "transform-flow-strip-types",
-    "transform-runtime"
+    "@babel/plugin-transform-flow-strip-types",
+    "@babel/plugin-transform-runtime"
   ]
 }
