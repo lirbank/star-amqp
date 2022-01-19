@@ -127,4 +127,4 @@ v0.0.6 - Message details are passed to worker
 v0.0.7 - Upgrade amqplib dependency to v0.5.3
 ([#5](https://github.com/lirbank/star-amqp/pull/5))
 
-v0.0.8 - Updated babel versions and config ([#18](https://github.com/lirbank/star-amqp/pull/18))
+v0.0.9 - Updated babel versions and config ([#18](https://github.com/lirbank/star-amqp/pull/18))
